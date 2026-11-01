@@ -150,9 +150,12 @@ item. Algorithm logic and rendering are deliberately separated:
 - **Keyboard** — `Space` toggles playback; `←` and `→` step through the trace.
 
 The stage renders color-coded bars for unsorted, comparing, swapping, pivot/key, and sorted
-states. The statistics strip reports comparisons, swaps/writes, trace execution time, and
-the current step out of the total. The pseudocode panel highlights the active line, while
-the notes panel explains the algorithm's intuition and its best, average, worst, and space
+states. Every bar carries its array value directly above it, centered on the bar; the label
+is attached to the bar and follows both height changes and horizontal swap animations.
+Labels scale down automatically for dense arrays so each value remains visible. The
+statistics strip reports comparisons, swaps/writes, trace execution time, and the current
+step out of the total. The pseudocode panel highlights the active line, while the notes
+panel explains the algorithm's intuition and its best, average, worst, and space
 complexity.
 
 Bogo Sort is capped at 8 elements for responsiveness. Its generator also enforces an
