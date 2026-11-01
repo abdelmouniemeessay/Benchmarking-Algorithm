@@ -1,0 +1,1186 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#F4F1EA">
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="AlgoLab is an academic algorithm performance laboratory: benchmark eight classic sorting and searching algorithms, inspect complexity, and step through SortLab's interactive visualizer.">
+  <title>Algorithm Performance Benchmark Dashboard — AlgoLab</title>
+  <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}" type="image/svg+xml">
+  <link rel="preload" href="{{ url_for('static', filename='fonts/inter-400.woff2') }}" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="{{ url_for('static', filename='fonts/inter-500.woff2') }}" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="{{ url_for('static', filename='fonts/inter-600.woff2') }}" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/sortlab.css') }}">
+</head>
+<body>
+  <a class="skip-link" href="#results">Skip to main content</a>
+
+  <svg class="svg-sprite" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="icon-play" viewBox="0 0 24 24"><path d="m8 5 11 7-11 7V5Z"/></symbol>
+    <symbol id="icon-pause" viewBox="0 0 24 24"><path d="M7 5h3v14H7zM14 5h3v14h-3z"/></symbol>
+    <symbol id="icon-step-back" viewBox="0 0 24 24"><path d="M18 5 8 12l10 7V5Z"/><path d="M5 5v14"/></symbol>
+    <symbol id="icon-step-forward" viewBox="0 0 24 24"><path d="m6 5 10 7L6 19V5Z"/><path d="M19 5v14"/></symbol>
+    <symbol id="icon-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+    <symbol id="icon-arrow-left" viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></symbol>
+    <symbol id="icon-arrow-up-right" viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9"/></symbol>
+    <symbol id="icon-reset" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></symbol>
+    <symbol id="icon-dice" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="2"/><circle cx="8.5" cy="8.5" r=".9" fill="currentColor"/><circle cx="15.5" cy="8.5" r=".9" fill="currentColor"/><circle cx="8.5" cy="15.5" r=".9" fill="currentColor"/><circle cx="15.5" cy="15.5" r=".9" fill="currentColor"/><circle cx="12" cy="12" r=".9" fill="currentColor"/></symbol>
+    <symbol id="icon-shuffle" viewBox="0 0 24 24"><path d="M3 6h3.5c4 0 6 12 10 12H21"/><path d="M18 15l3 3-3 3"/><path d="M3 18h3.5c1.2 0 2.2-1 3.2-2.5"/><path d="M14.5 8.5C15.5 7 16.5 6 18 6h3"/><path d="M18 3l3 3-3 3"/></symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7"/></symbol>
+    <symbol id="icon-sliders" viewBox="0 0 24 24"><path d="M4 7h6M14 7h6M4 17h10M18 17h2"/><circle cx="12" cy="7" r="2"/><circle cx="16" cy="17" r="2"/></symbol>
+    <symbol id="icon-database" viewBox="0 0 24 24"><ellipse cx="12" cy="5.5" rx="8" ry="3"/><path d="M4 5.5v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6M4 11.5v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></symbol>
+    <symbol id="icon-activity" viewBox="0 0 24 24"><path d="M3 12h4l2.5-7 5 14 2.5-7h4"/></symbol>
+    <symbol id="icon-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor"/></symbol>
+    <symbol id="icon-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3.5 2"/></symbol>
+    <symbol id="icon-trophy" viewBox="0 0 24 24"><path d="M8 4h8v4a4 4 0 0 1-8 0V4Z"/><path d="M8 6H4.5v1.5A4.5 4.5 0 0 0 9 12M16 6h3.5v1.5A4.5 4.5 0 0 1 15 12M12 12v5M8 21h8M9.5 17h5"/></symbol>
+    <symbol id="icon-bolt" viewBox="0 0 24 24"><path d="M13 2 4.5 13H11l-1 9L19.5 11H13l0-9Z"/></symbol>
+    <symbol id="icon-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><circle cx="12" cy="8" r=".9" fill="currentColor"/></symbol>
+    <symbol id="icon-bar-chart" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></symbol>
+    <symbol id="icon-trend-up" viewBox="0 0 24 24"><path d="m4 16 5-5 4 4 7-8"/><path d="M15 7h5v5"/></symbol>
+    <symbol id="icon-trend-down" viewBox="0 0 24 24"><path d="m4 8 5 5 4-4 7 8"/><path d="M15 17h5v-5"/></symbol>
+    <symbol id="icon-average" viewBox="0 0 24 24"><path d="M3 12h4l3-7 4 14 3-7h4"/></symbol>
+    <symbol id="icon-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></symbol>
+    <symbol id="icon-table" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16"/><path d="M3 10h18M9 10v10"/></symbol>
+    <symbol id="icon-layers" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 12 9 5 9-5"/><path d="m3 16 9 5 9-5"/></symbol>
+    <symbol id="icon-download" viewBox="0 0 24 24"><path d="M12 3v12m0 0 4-4m-4 4-4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></symbol>
+    <symbol id="icon-cpu" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/></symbol>
+    <symbol id="icon-terminal" viewBox="0 0 24 24"><path d="m4 6 5 5-5 5"/><path d="M12 18h8"/></symbol>
+    <symbol id="icon-chevron-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="icon-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+    <symbol id="icon-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="icon-book" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5v-16Z"/><path d="M4 18.5A2.5 2.5 0 0 1 6.5 16H20"/></symbol>
+    <symbol id="icon-code" viewBox="0 0 24 24"><path d="m8 8-4 4 4 4M16 8l4 4-4 4M14 4l-4 16"/></symbol>
+    <symbol id="icon-scale" viewBox="0 0 24 24"><path d="M12 3v18M5 6h14M7 6l-3 7h6L7 6ZM17 6l-3 7h6l-3-7Z"/><path d="M8 21h8"/></symbol>
+  </svg>
+
+  <header class="app-header">
+    <div class="header-inner">
+      <a class="brand" href="#/dashboard" aria-label="AlgoLab home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" fill="none">
+            <path d="M16 5 27 27H22.6L16 13.1 9.4 27H5L16 5Z" fill="currentColor"/>
+            <path d="M9 23h14" stroke="currentColor" stroke-width="1.6"/>
+            <path d="M16 18.5 12.4 27h7.2L16 18.5Z" fill="#F4F1EA"/>
+          </svg>
+        </span>
+        <span class="brand-copy">
+          <span class="brand-title">AlgoLab</span>
+          <span class="brand-subtitle">Algorithm Performance Laboratory</span>
+        </span>
+      </a>
+
+      <button class="nav-toggle" id="navToggle" type="button" aria-expanded="false" aria-controls="primaryNav">
+        <svg class="icon" aria-hidden="true"><use href="#icon-menu"></use></svg>
+        <span>Menu</span>
+      </button>
+
+      <nav class="primary-nav" id="primaryNav" aria-label="Primary navigation">
+        <a class="nav-link" href="#/dashboard" data-nav-view="dashboard">Dashboard</a>
+        <div class="nav-dropdown" data-dropdown>
+          <button class="nav-link nav-dropdown-toggle" id="algorithmsMenuButton" type="button" aria-expanded="false" aria-haspopup="true" aria-controls="algorithmsMenu">
+            <span>Algorithms</span>
+            <svg class="icon chevron" aria-hidden="true"><use href="#icon-chevron-down"></use></svg>
+          </button>
+          <div class="nav-dropdown-menu" id="algorithmsMenu" hidden>
+            <span class="menu-label">Algorithm library</span>
+            <a class="menu-item" href="#/algorithms/sorting" data-nav-view="sorting">
+              <span class="menu-icon" aria-hidden="true"><svg class="icon"><use href="#icon-bar-chart"></use></svg></span>
+              <span class="menu-copy">
+                <strong>Sorting Algorithms</strong>
+                <small>Six comparison sorts with benchmark data</small>
+              </span>
+              <span class="menu-count">6</span>
+            </a>
+            <a class="menu-item" href="#/algorithms/searching" data-nav-view="searching">
+              <span class="menu-icon" aria-hidden="true"><svg class="icon"><use href="#icon-target"></use></svg></span>
+              <span class="menu-copy">
+                <strong>Searching Algorithms</strong>
+                <small>Linear and binary search under the Q model</small>
+              </span>
+              <span class="menu-count">2</span>
+            </a>
+            <div class="menu-separator" aria-hidden="true"></div>
+            <a class="menu-item menu-item-feature" href="#/sortlab" data-nav-view="sortlab">
+              <span class="menu-icon" aria-hidden="true"><svg class="icon"><use href="#icon-activity"></use></svg></span>
+              <span class="menu-copy">
+                <strong>SortLab</strong>
+                <small>Interactive sorting visualizer and trace</small>
+              </span>
+              <span class="menu-badge">Integrated</span>
+            </a>
+          </div>
+        </div>
+        <a class="nav-link" href="#/benchmark" data-nav-view="benchmark">Benchmark</a>
+        <a class="nav-link" href="#/complexity" data-nav-view="complexity">Complexity</a>
+      </nav>
+
+      <div class="header-tools">
+        <div class="engine-status" id="engineStatus" data-state="online">
+          <span class="status-pulse" aria-hidden="true"></span>
+          <span class="engine-copy">
+            <strong id="engineLabel">Python engine</strong>
+            <small id="engineDetail">Online · perf_counter timing</small>
+          </span>
+          <span class="engine-badge">Local</span>
+        </div>
+        <button class="sidebar-toggle" id="sidebarToggle" type="button" aria-expanded="false" aria-controls="appSidebar">
+          <svg class="icon" aria-hidden="true"><use href="#icon-sliders"></use></svg>
+          <span>Setup</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="app-shell">
+    <aside class="sidebar" id="appSidebar" aria-label="Benchmark configuration">
+      <div class="sidebar-top">
+        <nav class="sidebar-nav" aria-label="Workspace sections">
+          <span class="sidebar-nav-label">Workspace</span>
+          <a class="nav-item is-active" href="#/dashboard" data-nav-view="dashboard">
+            <span class="nav-icon" aria-hidden="true"><svg class="icon"><use href="#icon-grid"></use></svg></span>
+            <span>Overview</span>
+            <span class="nav-indicator" aria-hidden="true"></span>
+          </a>
+          <a class="nav-item" href="#/benchmark" data-nav-view="benchmark">
+            <span class="nav-icon" aria-hidden="true"><svg class="icon"><use href="#icon-cpu"></use></svg></span>
+            <span>Benchmark</span>
+            <span class="nav-indicator" aria-hidden="true"></span>
+          </a>
+          <a class="nav-item" href="#/complexity" data-nav-view="complexity">
+            <span class="nav-icon" aria-hidden="true"><svg class="icon"><use href="#icon-layers"></use></svg></span>
+            <span>Complexity</span>
+            <span class="nav-indicator" aria-hidden="true"></span>
+          </a>
+          <span class="sidebar-nav-label">Algorithms</span>
+          <a class="nav-item nav-sub" href="#/algorithms/sorting" data-nav-view="sorting">
+            <span class="nav-icon" aria-hidden="true"><svg class="icon"><use href="#icon-bar-chart"></use></svg></span>
+            <span>Sorting</span>
+            <span class="nav-indicator" aria-hidden="true"></span>
+          </a>
+          <a class="nav-item nav-sub" href="#/algorithms/searching" data-nav-view="searching">
+            <span class="nav-icon" aria-hidden="true"><svg class="icon"><use href="#icon-target"></use></svg></span>
+            <span>Searching</span>
+            <span class="nav-indicator" aria-hidden="true"></span>
+          </a>
+          <a class="nav-item nav-sub" href="#/sortlab" data-nav-view="sortlab">
+            <span class="nav-icon" aria-hidden="true"><svg class="icon"><use href="#icon-activity"></use></svg></span>
+            <span>SortLab visualizer</span>
+            <span class="nav-indicator" aria-hidden="true"></span>
+          </a>
+        </nav>
+      </div>
+
+      <div class="sidebar-scroll">
+        <form class="control-panel" id="benchmarkForm" novalidate>
+          <div class="sidebar-head">
+            <div>
+              <span class="eyebrow">Benchmark setup</span>
+              <h2>Configuration</h2>
+            </div>
+            <button class="icon-button" id="resetBtn" type="button" title="Reset configuration" aria-label="Reset configuration">
+              <svg class="icon" aria-hidden="true"><use href="#icon-reset"></use></svg>
+            </button>
+          </div>
+
+          <section class="config-section" aria-labelledby="algorithmsHeading">
+            <div class="section-head">
+              <h3 id="algorithmsHeading">
+                <span class="section-icon" aria-hidden="true"><svg class="icon"><use href="#icon-sliders"></use></svg></span>
+                Algorithms
+              </h3>
+              <button class="text-button" id="selectAllBtn" type="button">Clear all</button>
+            </div>
+            <div class="algo-group">
+              <span class="algo-group-label">Sorting</span>
+              <div class="algo-list">
+                {% for algorithm in sorting_algorithms %}
+                <label class="algo-row" style="--algo-color: {{ algorithm.color }}">
+                  <input type="checkbox" name="algorithms" value="{{ algorithm.id }}" checked>
+                  <span class="algo-check" aria-hidden="true">
+                    <svg class="icon"><use href="#icon-check"></use></svg>
+                  </span>
+                  <span class="algo-name">{{ algorithm.name }}</span>
+                  <span class="algo-tag">{{ algorithm.complexity.average }}</span>
+                </label>
+                {% endfor %}
+              </div>
+            </div>
+            <div class="algo-group">
+              <span class="algo-group-label">Searching</span>
+              <div class="algo-list">
+                {% for algorithm in searching_algorithms %}
+                <label class="algo-row" style="--algo-color: {{ algorithm.color }}">
+                  <input type="checkbox" name="algorithms" value="{{ algorithm.id }}" checked>
+                  <span class="algo-check" aria-hidden="true">
+                    <svg class="icon"><use href="#icon-check"></use></svg>
+                  </span>
+                  <span class="algo-name">{{ algorithm.name }}</span>
+                  <span class="algo-tag">{{ algorithm.complexity.average }}</span>
+                </label>
+                {% endfor %}
+              </div>
+            </div>
+            <div class="selection-meta">
+              <span><span class="tiny-dot"></span><span id="algoCount">8 of 8 selected</span></span>
+              <span class="category-hint" id="algorithmBreakdown">6 sorting · 2 searching</span>
+            </div>
+          </section>
+
+          <section class="config-section" aria-labelledby="casesHeading">
+            <div class="section-head">
+              <h3 id="casesHeading">
+                <span class="section-icon" aria-hidden="true"><svg class="icon"><use href="#icon-layers"></use></svg></span>
+                Cases to include
+              </h3>
+              <span class="section-badge" id="caseCountBadge">3 selected</span>
+            </div>
+            <div class="case-grid">
+              <label class="case-option">
+                <input type="checkbox" name="cases" value="best" checked>
+                <span class="case-card">
+                  <svg class="icon" aria-hidden="true"><use href="#icon-trend-up"></use></svg>
+                  <span>Best</span>
+                </span>
+              </label>
+              <label class="case-option">
+                <input type="checkbox" name="cases" value="average" checked>
+                <span class="case-card">
+                  <svg class="icon" aria-hidden="true"><use href="#icon-average"></use></svg>
+                  <span>Average</span>
+                </span>
+              </label>
+              <label class="case-option">
+                <input type="checkbox" name="cases" value="worst" checked>
+                <span class="case-card">
+                  <svg class="icon" aria-hidden="true"><use href="#icon-trend-down"></use></svg>
+                  <span>Worst</span>
+                </span>
+              </label>
+            </div>
+          </section>
+
+          <section class="config-section" aria-labelledby="probabilityHeading">
+            <div class="section-head">
+              <h3 id="probabilityHeading">
+                <span class="section-icon" aria-hidden="true"><svg class="icon"><use href="#icon-target"></use></svg></span>
+                Search probability
+              </h3>
+              <span class="help-chip" title="The probability that the target element is absent. It weights average-case search trials.">Q</span>
+            </div>
+            <div class="q-control">
+              <label class="q-number" for="qInput">
+                <span>Q =</span>
+                <input id="qInput" type="number" min="0" max="1" step="0.01" inputmode="decimal" placeholder="1" aria-describedby="qHelp">
+                <span class="q-unit">absent</span>
+              </label>
+              <input class="q-range" id="qRange" type="range" min="0" max="1" step="0.01" value="1" aria-label="Target absence probability Q">
+            </div>
+            <div class="q-readout">
+              <span id="qValueLabel">Q = 1.00 <em>default</em></span>
+              <span id="qSplitLabel">100% absent · 0% present</span>
+            </div>
+            <p class="helper-text" id="qHelp">Leave blank to use the default Q = 1. Applied to average-case Linear &amp; Binary Search.</p>
+          </section>
+
+          <section class="config-section" aria-labelledby="datasetHeading">
+            <div class="section-head">
+              <h3 id="datasetHeading">
+                <span class="section-icon" aria-hidden="true"><svg class="icon"><use href="#icon-database"></use></svg></span>
+                Dataset values
+              </h3>
+              <span class="count-badge" id="valueCount">16 values</span>
+            </div>
+            <label class="sr-only" for="valuesInput">Dataset values</label>
+            <textarea id="valuesInput" name="values" rows="4" spellcheck="false" autocomplete="off" aria-describedby="datasetHelp formError">{{ default_values }}</textarea>
+            <div class="dataset-foot">
+              <span id="datasetHelp">Comma, space, or newline separated</span>
+              <button class="text-button with-icon" id="randomizeBtn" type="button">
+                <svg class="icon" aria-hidden="true"><use href="#icon-dice"></use></svg>
+                Randomize
+              </button>
+            </div>
+            <p class="form-error" id="formError" role="alert" hidden></p>
+          </section>
+        </form>
+      </div>
+
+      <div class="sidebar-foot">
+        <button class="primary-button sidebar-run" type="submit" form="benchmarkForm">
+          <svg class="icon" aria-hidden="true"><use href="#icon-play"></use></svg>
+          <span>Run benchmark</span>
+        </button>
+        <div class="run-summary">
+          <span class="run-summary-label">Selected workload</span>
+          <strong id="runMeta">8 algorithms · 3 cases</strong>
+          <span id="runFootnote">Runs locally · usually 1–4 seconds</span>
+          <span class="dirty-hint" id="dirtyHint" hidden>Changes not applied</span>
+        </div>
+      </div>
+    </aside>
+
+    <div class="sidebar-scrim" id="sidebarScrim" hidden></div>
+
+    <main class="main-content" id="results">
+      <!-- ================================================================== -->
+      <!-- DASHBOARD                                                          -->
+      <!-- ================================================================== -->
+      <section class="app-view" data-view="dashboard" id="view-dashboard">
+        <header class="page-header">
+          <div class="page-header-copy">
+            <span class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span>Workspace / Overview</span>
+            <div class="title-line">
+              <h2 id="resultsHeading">Algorithm performance</h2>
+              <span class="view-chip" id="viewChip">Average case</span>
+            </div>
+            <p class="page-subtitle" id="resultsSubtitle">Preparing your first benchmark…</p>
+          </div>
+          <div class="page-actions">
+            <div class="run-state" id="runStatus" data-state="loading" aria-live="polite">
+              <span class="run-state-dot" aria-hidden="true"></span>
+              <span id="runStateText">Benchmarking</span>
+            </div>
+            <button class="secondary-button" id="exportBtn" type="button">
+              <svg class="icon" aria-hidden="true"><use href="#icon-download"></use></svg>
+              <span>Export report</span>
+            </button>
+            <button class="primary-button run-button" id="runBtn" type="submit" form="benchmarkForm">
+              <span class="run-icon" aria-hidden="true">
+                <svg class="icon play-icon"><use href="#icon-play"></use></svg>
+                <span class="button-spinner" aria-hidden="true"></span>
+              </span>
+              <span class="run-copy">
+                <strong id="runButtonLabel">Run benchmark</strong>
+              </span>
+              <svg class="icon run-arrow" aria-hidden="true"><use href="#icon-arrow-right"></use></svg>
+            </button>
+          </div>
+        </header>
+
+        <section class="metric-band" aria-label="Benchmark highlights">
+          <article class="metric-cell" style="--stat-color: #314B5E">
+            <div class="stat-head">
+              <span class="stat-label">Fastest sorting</span>
+              <span class="stat-icon" aria-hidden="true"><svg class="icon"><use href="#icon-bar-chart"></use></svg></span>
+            </div>
+            <strong class="stat-value" id="fastestSortValue">—</strong>
+            <span class="stat-meta" id="fastestSortMeta">Awaiting benchmark</span>
+            <svg class="stat-spark" id="sortSpark" viewBox="0 0 160 40" preserveAspectRatio="none" aria-hidden="true">
+              <path class="spark-area" id="sortSparkArea" d=""></path>
+              <path class="spark-line" id="sortSparkLine" d=""></path>
+            </svg>
+          </article>
+
+          <article class="metric-cell" style="--stat-color: #3F6B5A">
+            <div class="stat-head">
+              <span class="stat-label">Fastest search</span>
+              <span class="stat-icon" aria-hidden="true"><svg class="icon"><use href="#icon-target"></use></svg></span>
+            </div>
+            <strong class="stat-value" id="fastestSearchValue">—</strong>
+            <span class="stat-meta" id="fastestSearchMeta">Awaiting benchmark</span>
+            <svg class="stat-spark" id="searchSpark" viewBox="0 0 160 40" preserveAspectRatio="none" aria-hidden="true">
+              <path class="spark-area" id="searchSparkArea" d=""></path>
+              <path class="spark-line" id="searchSparkLine" d=""></path>
+            </svg>
+          </article>
+
+          <article class="metric-cell" style="--stat-color: #4A6B8A">
+            <div class="stat-head">
+              <span class="stat-label">Largest input</span>
+              <span class="stat-icon" aria-hidden="true"><svg class="icon"><use href="#icon-database"></use></svg></span>
+            </div>
+            <strong class="stat-value" id="inputSizeValue">—</strong>
+            <span class="stat-meta" id="inputSizeMeta">values executed</span>
+            <span class="stat-footnote">Adaptive profile</span>
+          </article>
+
+          <article class="metric-cell" style="--stat-color: #A17A3F">
+            <div class="stat-head">
+              <span class="stat-label">Absence chance</span>
+              <span class="stat-icon" aria-hidden="true"><svg class="icon"><use href="#icon-bolt"></use></svg></span>
+            </div>
+            <strong class="stat-value" id="qStatValue">Q = 1.00</strong>
+            <span class="stat-meta" id="qStatMeta">Default · average search</span>
+            <div class="stat-qmeter" aria-hidden="true"><span id="qStatMeter" style="width: 100%"></span></div>
+          </article>
+        </section>
+
+        <section class="panel chart-panel performance-card" aria-labelledby="lineChartHeading">
+          <div class="panel-header chart-header">
+            <div class="panel-heading">
+              <span class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span>Execution time · scaling curve</span>
+              <div class="perf-headline">
+                <strong id="perfValue">—</strong>
+                <span class="perf-delta" id="perfDelta">Awaiting run</span>
+              </div>
+              <h3 id="lineChartHeading">Execution Time vs. Input Size</h3>
+              <p id="lineSubtitle">Median execution time measured across increasing input sizes.</p>
+            </div>
+            <div class="chart-actions">
+              <div class="case-switch" role="group" aria-label="Case view for charts">
+                <button type="button" class="case-switch-button" data-chart-case="best" disabled aria-pressed="false">Best</button>
+                <button type="button" class="case-switch-button" data-chart-case="average" disabled aria-pressed="false">Average</button>
+                <button type="button" class="case-switch-button" data-chart-case="worst" disabled aria-pressed="false">Worst</button>
+              </div>
+              <div class="scale-toggle">
+                <span>Log scale</span>
+                <button type="button" class="toggle is-on" id="logScaleToggle" role="switch" aria-checked="true" aria-label="Use logarithmic execution time scale">
+                  <span class="toggle-knob"></span>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="chart-canvas-wrap line-chart-wrap">
+            <canvas id="lineChart" role="img" aria-label="Line chart of execution time by input size for the selected algorithms"></canvas>
+            <div class="chart-overlay chart-loading" id="lineLoading">
+              <span class="spinner" aria-hidden="true"></span>
+              <span>Running Python benchmark…</span>
+            </div>
+            <div class="chart-overlay chart-empty" id="lineEmpty" hidden>
+              <span class="overlay-icon" aria-hidden="true"><svg class="icon"><use href="#icon-activity"></use></svg></span>
+              <strong>No chart data yet</strong>
+              <span>Configure a benchmark and press Run.</span>
+            </div>
+          </div>
+          <div class="chart-caption">
+            <span><span class="caption-line-key"></span>Median wall-clock time</span>
+            <span class="caption-muted">Tip: log scale reveals low-latency searches.</span>
+          </div>
+        </section>
+
+        <div class="content-grid content-grid-2">
+          <section class="panel chart-panel comparison-card" aria-labelledby="barChartHeading">
+            <div class="panel-header chart-header">
+              <div class="panel-heading">
+                <span class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span>Head-to-head</span>
+                <h3 id="barChartHeading">Algorithm Comparison</h3>
+                <p id="barSubtitle">Average-case execution time at the largest input size.</p>
+              </div>
+              <div class="bar-winner" id="barWinner" hidden>
+                <svg class="icon" aria-hidden="true"><use href="#icon-trophy"></use></svg>
+                <span id="barWinnerText">Fastest</span>
+              </div>
+            </div>
+            <div class="chart-canvas-wrap bar-chart-wrap">
+              <canvas id="barChart" role="img" aria-label="Bar chart comparing algorithm execution times at the largest input size"></canvas>
+              <div class="chart-overlay chart-loading" id="barLoading">
+                <span class="spinner" aria-hidden="true"></span>
+                <span>Measuring algorithms…</span>
+              </div>
+              <div class="chart-overlay chart-empty" id="barEmpty" hidden>
+                <span class="overlay-icon" aria-hidden="true"><svg class="icon"><use href="#icon-bar-chart"></use></svg></span>
+                <strong>No comparison yet</strong>
+                <span>Results appear after a benchmark run.</span>
+              </div>
+            </div>
+            <div class="chart-caption">
+              <span>Bars ordered fastest to slowest</span>
+              <span class="caption-muted" id="barCaption">Largest input · —</span>
+            </div>
+          </section>
+
+          <section class="panel model-card" aria-labelledby="modelHeading">
+            <div class="panel-header model-head">
+              <div class="panel-heading">
+                <span class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span>Target probability</span>
+                <h3 id="modelHeading">Search Model</h3>
+              </div>
+              <span class="q-badge" id="modelQBadge">Q = 1.00</span>
+            </div>
+            <div class="formula-block">
+              <span class="formula-label">Expected comparisons · Linear Search</span>
+              <div class="formula">
+                <span>E[C<sub>n</sub>]</span>
+                <span class="formula-operator">=</span>
+                <span>(1 − Q) · <span class="frac"><span>n + 1</span><span>2</span></span> + Q · n</span>
+              </div>
+            </div>
+            <div class="probability-block">
+              <div class="probability-labels">
+                <span><i class="probability-dot present"></i> Present <strong id="modelPresent">0%</strong></span>
+                <span><i class="probability-dot absent"></i> Absent <strong id="modelAbsent">100%</strong></span>
+              </div>
+              <div class="probability-track" aria-hidden="true">
+                <span class="probability-present" id="modelPresentTrack" style="width: 0%"></span>
+                <span class="probability-absent" id="modelAbsentTrack" style="width: 100%"></span>
+              </div>
+            </div>
+            <div class="model-result">
+              <span>At n = <strong id="modelN">—</strong>, expected</span>
+              <span class="model-number"><strong id="modelExpected">—</strong> <small>comparisons</small></span>
+            </div>
+            <p class="model-note" id="modelNote">Q weights average-case search trials. Leave the field blank to use Q = 1.</p>
+          </section>
+        </div>
+
+        <div class="content-grid content-grid-2">
+          <section class="panel activity-card" aria-labelledby="activityHeading">
+            <div class="panel-header rail-head">
+              <div class="panel-heading">
+                <span class="eyebrow">Live feed</span>
+                <h3 id="activityHeading">Execution activity</h3>
+              </div>
+              <span class="live-tag"><span class="live-dot" aria-hidden="true"></span>Live</span>
+            </div>
+            <div class="activity-feed" id="activityFeed">
+              <div class="activity-empty">
+                <span class="activity-empty-icon" aria-hidden="true"><svg class="icon"><use href="#icon-activity"></use></svg></span>
+                <strong>Awaiting execution</strong>
+                <span>Algorithm events will stream in here.</span>
+              </div>
+            </div>
+            <div class="rail-foot">
+              <span id="activityFoot">No runs yet</span>
+              <a class="rail-link" href="#tableHeading">View breakdown <svg class="icon" aria-hidden="true"><use href="#icon-arrow-up-right"></use></svg></a>
+            </div>
+          </section>
+
+          <section class="panel allocation-card" aria-labelledby="allocationHeading">
+            <div class="panel-header rail-head">
+              <div class="panel-heading">
+                <span class="eyebrow">Execution share</span>
+                <h3 id="allocationHeading">Algorithm allocation</h3>
+              </div>
+              <span class="rail-chip" aria-hidden="true">%</span>
+            </div>
+            <div class="allocation-total">
+              <strong id="allocationTotal">—</strong>
+              <span id="allocationMeta">Total measured time across algorithms</span>
+            </div>
+            <div class="allocation-list" id="allocationList">
+              <div class="allocation-empty">Run a benchmark to allocate execution time.</div>
+            </div>
+          </section>
+        </div>
+
+        <section class="panel table-card" aria-labelledby="tableHeading">
+          <div class="panel-header table-header">
+            <div class="panel-heading">
+              <span class="eyebrow">Full breakdown</span>
+              <h3 id="tableHeading">Case-by-case results</h3>
+              <p id="tableSubtitle">Execution time per algorithm at the largest input size.</p>
+            </div>
+            <span class="table-key"><span class="best-key-dot"></span> Fastest in case</span>
+          </div>
+          <div class="table-wrap">
+            <table class="results-table">
+              <thead>
+                <tr>
+                  <th scope="col">Algorithm</th>
+                  <th scope="col">Class</th>
+                  <th scope="col">Best case</th>
+                  <th scope="col">Average case</th>
+                  <th scope="col">Worst case</th>
+                </tr>
+              </thead>
+              <tbody id="resultsBody">
+                <tr class="table-placeholder">
+                  <td colspan="5">Waiting for the first benchmark result…</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="table-note" id="tableNote" hidden>— means that case was not included in this run.</p>
+        </section>
+
+        <div class="dashboard-footer-links">
+          <a href="#/benchmark" data-nav-view="benchmark">Benchmark methodology <svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"></use></svg></a>
+          <a href="#/complexity" data-nav-view="complexity">Complexity reference <svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"></use></svg></a>
+        </div>
+
+        <footer class="main-footer">
+          <span>Times measured in Python with <code>time.perf_counter_ns()</code>.</span>
+          <span class="footer-sep" aria-hidden="true"></span>
+          <span>Pure algorithm implementations, no library sorting shortcuts.</span>
+        </footer>
+      </section>
+
+      <!-- ================================================================== -->
+      <!-- BENCHMARK                                                          -->
+      <!-- ================================================================== -->
+      <section class="app-view" data-view="benchmark" id="view-benchmark" hidden>
+        <header class="page-header">
+          <div class="page-header-copy">
+            <span class="eyebrow">Workspace / Benchmark</span>
+            <h2>Performance benchmark</h2>
+            <p class="page-subtitle">Configure the workload in the sidebar, then run a measurement pass. The engine executes each selected algorithm in Python and returns a complete timing series.</p>
+          </div>
+          <div class="page-actions">
+            <button class="secondary-button" id="benchmarkExportBtn" type="button">
+              <svg class="icon" aria-hidden="true"><use href="#icon-download"></use></svg>
+              <span>Export report</span>
+            </button>
+            <button class="primary-button" type="submit" form="benchmarkForm">
+              <svg class="icon" aria-hidden="true"><use href="#icon-play"></use></svg>
+              <span>Run benchmark</span>
+            </button>
+          </div>
+        </header>
+
+        <div class="content-grid content-grid-2">
+          <section class="panel protocol-panel">
+            <div class="panel-header">
+              <div class="panel-heading">
+                <span class="eyebrow">Protocol</span>
+                <h3>What the engine measures</h3>
+              </div>
+            </div>
+            <div class="protocol-list">
+              <div class="protocol-item">
+                <span class="protocol-index">01</span>
+                <div>
+                  <strong>Wall-clock timing</strong>
+                  <p>Each algorithm runs against a shared workload using Python's monotonic <code>time.perf_counter_ns()</code> clock. Sorting uses the median of repeated timed runs; searches use the median of batched calls.</p>
+                </div>
+              </div>
+              <div class="protocol-item">
+                <span class="protocol-index">02</span>
+                <div>
+                  <strong>Shared workloads</strong>
+                  <p>Best, average, and worst cases are generated once per input size and shared across algorithms so comparisons remain fair. Search benchmarks always use sorted copies because Binary Search requires ordered input.</p>
+                </div>
+              </div>
+              <div class="protocol-item">
+                <span class="protocol-index">03</span>
+                <div>
+                  <strong>Q-weighted search</strong>
+                  <p>Q is the probability that a target is absent. Average-case search timing blends present-target and absent-target measurements by Q; best and worst search cases remain deterministic.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel profile-panel">
+            <div class="panel-header">
+              <div class="panel-heading">
+                <span class="eyebrow">Workload profiles</span>
+                <h3>Adaptive input sizes</h3>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table class="results-table profile-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Profile</th>
+                    <th scope="col">Used when</th>
+                    <th scope="col">Maximum n</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>quadratic</code></td>
+                    <td>Any quadratic sort is selected</td>
+                    <td>500</td>
+                  </tr>
+                  <tr>
+                    <td><code>sorting</code></td>
+                    <td>Only non-quadratic sorts are selected</td>
+                    <td>3,000</td>
+                  </tr>
+                  <tr>
+                    <td><code>searching</code></td>
+                    <td>Only search algorithms are selected</td>
+                    <td>20,000</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p class="panel-note">Datasets above the profile cap are evenly sampled. Input sizes above the supplied dataset are extended with deterministic offsets to model scaling without duplicate-heavy data.</p>
+          </section>
+        </div>
+
+        <section class="panel notes-panel" aria-labelledby="notesHeading">
+          <div class="panel-header">
+            <div class="panel-heading">
+              <span class="eyebrow">Run notes</span>
+              <h3 id="notesHeading">Configuration observations</h3>
+            </div>
+          </div>
+          <div class="benchmark-notes" id="benchmarkNotes" hidden></div>
+          <p class="empty-note" id="notesEmpty">Run a benchmark to generate observations about sampling, workload profiles, and Q weighting.</p>
+        </section>
+
+        <div class="content-grid content-grid-2">
+          <section class="panel reading-panel">
+            <div class="panel-header">
+              <div class="panel-heading">
+                <span class="eyebrow">Interpretation</span>
+                <h3>Reading the measurements</h3>
+              </div>
+            </div>
+            <p>Timings are machine-dependent. Compare algorithms within a single run rather than across machines or sessions. The Complexity reference is theoretical Big-O; the charts show measured behavior, which can differ for a particular implementation and workload.</p>
+            <a class="text-link" href="#/complexity" data-nav-view="complexity">Open the complexity reference <svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"></use></svg></a>
+          </section>
+          <section class="panel reading-panel">
+            <div class="panel-header">
+              <div class="panel-heading">
+                <span class="eyebrow">Limits</span>
+                <h3>Run boundaries</h3>
+              </div>
+            </div>
+            <ul class="plain-list">
+              <li>Maximum dataset: <strong>20,000 values</strong> per run.</li>
+              <li>Runs are stateless; results are not persisted between reloads.</li>
+              <li>The server binds to <code>127.0.0.1:5000</code> by default.</li>
+              <li>Chart.js and Inter are served locally; no CDN is required.</li>
+            </ul>
+          </section>
+        </div>
+
+        <footer class="main-footer">
+          <span>Benchmark protocol documented from the AlgoLab Python engine.</span>
+          <span class="footer-sep" aria-hidden="true"></span>
+          <span>Results are not persisted across sessions.</span>
+        </footer>
+      </section>
+
+      <!-- ================================================================== -->
+      <!-- SORTING ALGORITHMS                                                 -->
+      <!-- ================================================================== -->
+      <section class="app-view" data-view="sorting" id="view-sorting" hidden>
+        <header class="page-header">
+          <div class="page-header-copy">
+            <span class="eyebrow">Algorithms / Sorting</span>
+            <h2>Sorting algorithms</h2>
+            <p class="page-subtitle">Six comparison sorts implemented in pure Python for the benchmark engine. Open any algorithm in SortLab to inspect its execution trace, or send it directly to the benchmark configuration.</p>
+          </div>
+          <div class="page-actions">
+            <a class="secondary-button" href="#/sortlab" data-nav-view="sortlab">
+              <svg class="icon" aria-hidden="true"><use href="#icon-activity"></use></svg>
+              <span>Open SortLab</span>
+            </a>
+          </div>
+        </header>
+
+        <div class="catalog-summary">
+          <span><strong>6</strong> sorting algorithms</span>
+          <span class="summary-sep" aria-hidden="true"></span>
+          <span>Best / average / worst / space</span>
+          <span class="summary-sep" aria-hidden="true"></span>
+          <span>Python benchmark engine</span>
+        </div>
+
+        <section class="panel catalog-panel" aria-label="Sorting algorithm catalog">
+          <div class="catalog-head" aria-hidden="true">
+            <span>Algorithm</span>
+            <span>Complexity</span>
+            <span>Actions</span>
+          </div>
+          {% for algorithm in sorting_algorithms %}
+          <article class="catalog-row" style="--algo-color: {{ algorithm.color }}">
+            <div class="catalog-main">
+              <span class="catalog-index">{{ "%02d"|format(loop.index) }}</span>
+              <div class="catalog-copy">
+                <div class="catalog-title-line">
+                  <h3 class="catalog-name">{{ algorithm.name }}</h3>
+                  <span class="catalog-color" aria-hidden="true"></span>
+                </div>
+                <p class="catalog-desc">{{ algorithm.description }}</p>
+                <div class="catalog-tags">
+                  <span class="tag">{{ algorithm.method }}</span>
+                  {% if algorithm.stable %}<span class="tag">Stable</span>{% else %}<span class="tag">Not stable</span>{% endif %}
+                </div>
+              </div>
+            </div>
+            <div class="catalog-complexity">
+              <div><span class="mini-label">Best</span><code>{{ algorithm.complexity.best }}</code></div>
+              <div><span class="mini-label">Average</span><code>{{ algorithm.complexity.average }}</code></div>
+              <div><span class="mini-label">Worst</span><code>{{ algorithm.complexity.worst }}</code></div>
+              <div><span class="mini-label">Space</span><code>{{ algorithm.complexity.space }}</code></div>
+            </div>
+            <div class="catalog-actions">
+              {% if algorithm.sortlab_key %}
+              <button class="small-button" type="button" data-open-sortlab="{{ algorithm.sortlab_key }}">
+                <svg class="icon" aria-hidden="true"><use href="#icon-activity"></use></svg>
+                Visualize
+              </button>
+              {% endif %}
+              <button class="small-button small-button-quiet" type="button" data-benchmark-algorithm="{{ algorithm.id }}">
+                <svg class="icon" aria-hidden="true"><use href="#icon-cpu"></use></svg>
+                Benchmark
+              </button>
+            </div>
+          </article>
+          {% endfor %}
+        </section>
+
+        <section class="callout">
+          <span class="callout-icon" aria-hidden="true"><svg class="icon"><use href="#icon-activity"></use></svg></span>
+          <div>
+            <strong>SortLab is part of the Algorithms menu.</strong>
+            <p>It replays precomputed comparison, swap, and overwrite events at a controlled pace. Use it to connect the benchmark's measured behavior with the algorithm's step-by-step mechanics.</p>
+          </div>
+          <a class="text-link" href="#/sortlab" data-nav-view="sortlab">Open visualizer <svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"></use></svg></a>
+        </section>
+
+        <footer class="main-footer">
+          <span>Catalog metadata mirrors the Python algorithm registry.</span>
+          <span class="footer-sep" aria-hidden="true"></span>
+          <span>SortLab traces are generated in the browser.</span>
+        </footer>
+      </section>
+
+      <!-- ================================================================== -->
+      <!-- SEARCHING ALGORITHMS                                               -->
+      <!-- ================================================================== -->
+      <section class="app-view" data-view="searching" id="view-searching" hidden>
+        <header class="page-header">
+          <div class="page-header-copy">
+            <span class="eyebrow">Algorithms / Searching</span>
+            <h2>Searching algorithms</h2>
+            <p class="page-subtitle">Two search strategies measured under the Q model. Binary Search requires a sorted search space; the benchmark engine prepares that automatically.</p>
+          </div>
+          <div class="page-actions">
+            <a class="secondary-button" href="#/benchmark" data-nav-view="benchmark">
+              <svg class="icon" aria-hidden="true"><use href="#icon-cpu"></use></svg>
+              <span>Benchmark setup</span>
+            </a>
+          </div>
+        </header>
+
+        <div class="catalog-summary">
+          <span><strong>2</strong> searching algorithms</span>
+          <span class="summary-sep" aria-hidden="true"></span>
+          <span>Present / absent target model</span>
+          <span class="summary-sep" aria-hidden="true"></span>
+          <span>Q-weighted average case</span>
+        </div>
+
+        <section class="panel catalog-panel" aria-label="Searching algorithm catalog">
+          <div class="catalog-head" aria-hidden="true">
+            <span>Algorithm</span>
+            <span>Complexity</span>
+            <span>Actions</span>
+          </div>
+          {% for algorithm in searching_algorithms %}
+          <article class="catalog-row" style="--algo-color: {{ algorithm.color }}">
+            <div class="catalog-main">
+              <span class="catalog-index">{{ "%02d"|format(loop.index) }}</span>
+              <div class="catalog-copy">
+                <div class="catalog-title-line">
+                  <h3 class="catalog-name">{{ algorithm.name }}</h3>
+                  <span class="catalog-color" aria-hidden="true"></span>
+                </div>
+                <p class="catalog-desc">{{ algorithm.description }}</p>
+                <div class="catalog-tags">
+                  <span class="tag">{{ algorithm.method }}</span>
+                  <span class="tag">Q-weighted average</span>
+                </div>
+              </div>
+            </div>
+            <div class="catalog-complexity">
+              <div><span class="mini-label">Best</span><code>{{ algorithm.complexity.best }}</code></div>
+              <div><span class="mini-label">Average</span><code>{{ algorithm.complexity.average }}</code></div>
+              <div><span class="mini-label">Worst</span><code>{{ algorithm.complexity.worst }}</code></div>
+              <div><span class="mini-label">Space</span><code>{{ algorithm.complexity.space }}</code></div>
+            </div>
+            <div class="catalog-actions">
+              <button class="small-button small-button-quiet" type="button" data-benchmark-algorithm="{{ algorithm.id }}">
+                <svg class="icon" aria-hidden="true"><use href="#icon-cpu"></use></svg>
+                Benchmark
+              </button>
+            </div>
+          </article>
+          {% endfor %}
+        </section>
+
+        <section class="callout">
+          <span class="callout-icon" aria-hidden="true"><svg class="icon"><use href="#icon-target"></use></svg></span>
+          <div>
+            <strong>Q is the probability that a target is absent.</strong>
+            <p>Average-case search timing blends present-target and absent-target measurements by Q. Best and worst search cases remain deterministic; Q only changes the average case.</p>
+          </div>
+          <a class="text-link" href="#/dashboard" data-nav-view="dashboard">Inspect the search model <svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"></use></svg></a>
+        </section>
+
+        <footer class="main-footer">
+          <span>Search benchmarks operate on sorted copies of the dataset.</span>
+          <span class="footer-sep" aria-hidden="true"></span>
+          <span>Binary Search requires ordered input.</span>
+        </footer>
+      </section>
+
+      <!-- ================================================================== -->
+      <!-- COMPLEXITY                                                         -->
+      <!-- ================================================================== -->
+      <section class="app-view" data-view="complexity" id="view-complexity" hidden>
+        <header class="page-header">
+          <div class="page-header-copy">
+            <span class="eyebrow">Reference / Big-O</span>
+            <h2>Complexity reference</h2>
+            <p class="page-subtitle">Theoretical asymptotic bounds for every algorithm in the benchmark registry. These bounds describe growth, not machine-specific timings.</p>
+          </div>
+        </header>
+
+        <section class="panel complexity-panel" aria-labelledby="complexityHeading">
+          <div class="panel-header">
+            <div class="panel-heading">
+              <span class="eyebrow">Asymptotic analysis</span>
+              <h3 id="complexityHeading">Complexity Overview</h3>
+              <p>Time complexity by case, plus auxiliary space.</p>
+            </div>
+            <span class="complexity-symbol" aria-hidden="true">O</span>
+          </div>
+          <div class="table-wrap">
+            <table class="results-table complexity-table">
+              <thead>
+                <tr>
+                  <th scope="col">Algorithm</th>
+                  <th scope="col">Class</th>
+                  <th scope="col">Best</th>
+                  <th scope="col">Average</th>
+                  <th scope="col">Worst</th>
+                  <th scope="col">Space</th>
+                  <th scope="col">Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for algorithm in algorithms %}
+                <tr>
+                  <td>
+                    <span class="table-algo" style="--algo-color: {{ algorithm.color }}">
+                      <span class="table-algo-dot" aria-hidden="true"></span>
+                      <span>{{ algorithm.name }}</span>
+                    </span>
+                  </td>
+                  <td><span class="class-badge {{ algorithm.category }}">{{ algorithm.category|capitalize }}</span></td>
+                  <td><code class="complexity-code">{{ algorithm.complexity.best }}</code></td>
+                  <td><code class="complexity-code">{{ algorithm.complexity.average }}</code></td>
+                  <td><code class="complexity-code">{{ algorithm.complexity.worst }}</code></td>
+                  <td><code class="complexity-code">{{ algorithm.complexity.space }}</code></td>
+                  <td class="complexity-note">{{ algorithm.description }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <div class="content-grid content-grid-2">
+          <section class="panel reading-panel">
+            <div class="panel-header">
+              <div class="panel-heading">
+                <span class="eyebrow">Reading the table</span>
+                <h3>Growth, not stopwatch time</h3>
+              </div>
+            </div>
+            <p>Big-O describes how work grows as input size increases. A lower-order algorithm can still be slower for small inputs because constants and implementation details matter. The benchmark charts show measured wall-clock behavior for the selected workload.</p>
+          </section>
+          <section class="panel reading-panel">
+            <div class="panel-header">
+              <div class="panel-heading">
+                <span class="eyebrow">Measured vs theoretical</span>
+                <h3>Why the curves can differ</h3>
+              </div>
+            </div>
+            <p>A shared workload can produce a different shape than the theoretical worst case. For example, Quick Sort with median-of-three pivots behaves well on reverse-sorted input. Treat the complexity table as a reference and the charts as an experiment.</p>
+          </section>
+        </div>
+
+        <footer class="main-footer">
+          <span>The Complexity Overview is theoretical Big-O.</span>
+          <span class="footer-sep" aria-hidden="true"></span>
+          <span>Charts show measured behavior.</span>
+        </footer>
+      </section>
+
+      <!-- ================================================================== -->
+      <!-- SORTLAB                                                            -->
+      <!-- ================================================================== -->
+      <section class="app-view sortlab-view" data-view="sortlab" id="view-sortlab" hidden>
+        <header class="page-header sortlab-page-header">
+          <div class="page-header-copy">
+            <span class="eyebrow">Algorithms / SortLab</span>
+            <div class="title-line">
+              <h2>SortLab</h2>
+              <span class="view-chip">Interactive visualizer</span>
+            </div>
+            <p class="page-subtitle">A step-by-step execution trace for sorting algorithms. Every comparison, swap, and overwrite is recorded before playback, so you can pause, reverse, and inspect the mechanics at any point.</p>
+          </div>
+          <div class="page-actions">
+            <a class="secondary-button" href="#/algorithms/sorting" data-nav-view="sorting">
+              <svg class="icon" aria-hidden="true"><use href="#icon-book"></use></svg>
+              <span>Algorithm library</span>
+            </a>
+          </div>
+        </header>
+
+        <div class="sortlab-layout">
+          <aside class="panel sortlab-controls" aria-label="SortLab controls">
+            <div class="sortlab-control-head">
+              <span class="eyebrow">Execution controls</span>
+              <h3>Trace setup</h3>
+            </div>
+
+            <div class="sl-field">
+              <label for="slAlgorithm">Algorithm</label>
+              <select id="slAlgorithm"></select>
+              <p class="sl-hint" id="slAlgorithmHint">29 algorithms across six families.</p>
+            </div>
+
+            <div class="sl-field">
+              <label for="slSize">Array size <output id="slSizeValue" for="slSize">30</output></label>
+              <input id="slSize" type="range" min="5" max="60" step="1" value="30">
+            </div>
+
+            <div class="sl-field">
+              <label for="slSpeed">Playback speed <output id="slSpeedValue" for="slSpeed">5×</output></label>
+              <input id="slSpeed" type="range" min="1" max="10" step="1" value="5">
+            </div>
+
+            <div class="sl-field">
+              <label for="slCustom">Custom array <span class="sl-label-note">5–60 values, comma separated</span></label>
+              <div class="sl-inline">
+                <input id="slCustom" type="text" placeholder="42, 17, 8, 63, 4, 55" autocomplete="off" spellcheck="false">
+                <button class="small-button" id="slApplyCustom" type="button">Apply</button>
+              </div>
+              <p class="sl-hint" id="slCustomHint">Integers from 1 to 500.</p>
+            </div>
+
+            <div class="sl-control-actions">
+              <button class="secondary-button" id="slRandomize" type="button">
+                <svg class="icon" aria-hidden="true"><use href="#icon-shuffle"></use></svg>
+                Random array
+              </button>
+              <button class="secondary-button" id="slReset" type="button">
+                <svg class="icon" aria-hidden="true"><use href="#icon-reset"></use></svg>
+                Reset
+              </button>
+            </div>
+
+            <div class="sl-shortcuts">
+              <span class="mini-label">Keyboard</span>
+              <span><kbd>Space</kbd> play / pause</span>
+              <span><kbd>←</kbd><kbd>→</kbd> step through trace</span>
+            </div>
+          </aside>
+
+          <div class="sortlab-main">
+            <section class="panel sortlab-stage-panel" aria-labelledby="slStageHeading">
+              <div class="sortlab-stage-head">
+                <div class="panel-heading">
+                  <span class="eyebrow">Execution trace</span>
+                  <h3 id="slStageHeading">Array state</h3>
+                </div>
+                <div class="sortlab-stats" aria-label="Execution statistics">
+                  <div class="sl-stat">
+                    <span class="mini-label">Comparisons</span>
+                    <strong id="slComparisons">0</strong>
+                  </div>
+                  <div class="sl-stat">
+                    <span class="mini-label">Swaps / writes</span>
+                    <strong id="slSwaps">0</strong>
+                  </div>
+                  <div class="sl-stat">
+                    <span class="mini-label">Execution time</span>
+                    <strong id="slExecution">—</strong>
+                  </div>
+                  <div class="sl-stat">
+                    <span class="mini-label">Steps</span>
+                    <strong id="slStepCount">0 / 0</strong>
+                  </div>
+                </div>
+              </div>
+              <div class="sl-progress" aria-hidden="true"><span id="slProgressBar"></span></div>
+              <div class="sortlab-stage" id="slBars" role="img" aria-label="Sorting array visualization"></div>
+              <div class="sortlab-stage-foot">
+                <div class="sl-legend" aria-label="Color legend">
+                  <span class="sl-legend-item"><i class="sw sw-default"></i>Unsorted</span>
+                  <span class="sl-legend-item"><i class="sw sw-compare"></i>Comparing</span>
+                  <span class="sl-legend-item"><i class="sw sw-swap"></i>Swapping</span>
+                  <span class="sl-legend-item"><i class="sw sw-pivot"></i>Pivot / key</span>
+                  <span class="sl-legend-item"><i class="sw sw-sorted"></i>Sorted</span>
+                </div>
+                <span class="sl-status" id="slStatus" data-state="idle" aria-live="polite">Idle</span>
+              </div>
+            </section>
+
+            <section class="panel sortlab-playback-panel" aria-label="Playback controls">
+              <div class="sl-playback">
+                <button class="primary-button" id="slPlay" type="button">
+                  <svg class="icon sl-icon-play" aria-hidden="true"><use href="#icon-play"></use></svg>
+                  <svg class="icon sl-icon-pause" aria-hidden="true" hidden><use href="#icon-pause"></use></svg>
+                  <span id="slPlayLabel">Play</span>
+                </button>
+                <button class="icon-button" id="slPrev" type="button" title="Previous step" aria-label="Previous step">
+                  <svg class="icon" aria-hidden="true"><use href="#icon-step-back"></use></svg>
+                </button>
+                <button class="icon-button" id="slNext" type="button" title="Next step" aria-label="Next step">
+                  <svg class="icon" aria-hidden="true"><use href="#icon-step-forward"></use></svg>
+                </button>
+                <button class="icon-button" id="slStepReset" type="button" title="Reset trace" aria-label="Reset trace">
+                  <svg class="icon" aria-hidden="true"><use href="#icon-reset"></use></svg>
+                </button>
+                <div class="sl-playback-meta">
+                  <span class="mini-label">Current step</span>
+                  <strong id="slStepLabel">0</strong>
+                </div>
+              </div>
+            </section>
+
+            <div class="sortlab-lower">
+              <section class="panel sortlab-code-panel" aria-labelledby="slCodeHeading">
+                <div class="sortlab-code-head">
+                  <div class="panel-heading">
+                    <span class="eyebrow">Pseudocode</span>
+                    <h3 id="slCodeHeading">Execution trace</h3>
+                  </div>
+                  <code id="slCodeFile">bubbleSort.js</code>
+                </div>
+                <pre class="sl-code" id="slCode" tabindex="0" aria-label="Algorithm pseudocode"></pre>
+              </section>
+
+              <section class="panel sortlab-docs-panel" aria-labelledby="slDocsHeading">
+                <div class="sortlab-docs-head">
+                  <div class="panel-heading">
+                    <span class="eyebrow">Algorithm notes</span>
+                    <h3 id="slDocsHeading">Bubble Sort</h3>
+                  </div>
+                  <span class="sl-algo-badge" id="slAlgoBadge">Quadratic</span>
+                </div>
+                <p class="sl-intuition" id="slIntuition"></p>
+                <div class="sl-complexity-grid">
+                  <div class="sl-complexity-card is-best">
+                    <div class="sl-complexity-head"><span>Best</span><code id="slBest"></code></div>
+                    <p id="slBestWhy"></p>
+                  </div>
+                  <div class="sl-complexity-card is-average">
+                    <div class="sl-complexity-head"><span>Average</span><code id="slAvg"></code></div>
+                    <p id="slAvgWhy"></p>
+                  </div>
+                  <div class="sl-complexity-card is-worst">
+                    <div class="sl-complexity-head"><span>Worst</span><code id="slWorst"></code></div>
+                    <p id="slWorstWhy"></p>
+                  </div>
+                  <div class="sl-complexity-card is-space">
+                    <div class="sl-complexity-head"><span>Space</span><code id="slSpace"></code></div>
+                    <p id="slSpaceWhy"></p>
+                  </div>
+                </div>
+              </section>
+            </div>
+          </div>
+        </div>
+
+        <footer class="main-footer">
+          <span>SortLab traces are precomputed in the browser; playback is separate from the Python benchmark engine.</span>
+          <span class="footer-sep" aria-hidden="true"></span>
+          <span>29 algorithms · step-by-step execution</span>
+        </footer>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast-region" id="toastRegion" aria-live="polite" aria-atomic="false"></div>
+
+  <script>
+    window.APP_CONFIG = {{ app_config|tojson }};
+  </script>
+  <script src="{{ url_for('static', filename='vendor/chart.umd.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/sortlab-algorithms.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/navigation.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/sortlab.js') }}"></script>
+</body>
+</html>
